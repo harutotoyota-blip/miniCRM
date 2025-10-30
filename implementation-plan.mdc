@@ -24,8 +24,8 @@ Done
 フロントを Vite+React+TS で起動し、`ContactsPage` を `App.tsx` へ組み込み。`ContactsAPI.list()` で `/api/contacts` を取得し、読み込み状態と共に一覧表示を実装。
 
 ## Step 5: 追加/編集/削除 UI
-- 状態: Pending
-- メモ: フォームとAPI連携、基本バリデーション
+- 状態: Done
+- メモ: フォームとAPI連携、基本バリデーションを実装。追加フォーム、編集モード（フォームに初期値を設定）、削除の確認ダイアログを追加し、API の create/update/delete と連携済み。
 
 ## Step 6: テスト・エラーハンドリング整備
 - 状態: Pending
