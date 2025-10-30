@@ -1,0 +1,10 @@
+backend/.venv/
+**/__pycache__/
+**/*.pyc
+backend/mini_crm.db
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+.cursor/
+.DS_Store
+*.env

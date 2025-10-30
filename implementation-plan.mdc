@@ -1,0 +1,29 @@
+---
+alwaysApply: true
+---
+
+# Implementation Plan
+
+## Step 1: プロジェクト初期化（backend, frontend, ルール作成）
+- 状態: Done
+- メモ: backend/frontend/cursor-rules を作成。依存ファイルと雛形を配置。
+
+## Step 2: FastAPI 起動と DB 接続
+- 状態: Pending
+- メモ: /health エンドポイント、SQLite 接続
+
+## Step 3: Contacts CRUD API 実装
+- 状態: Pending
+- メモ: POST/GET/PUT/DELETE、Pydanticスキーマ、ユニーク制約(email)
+
+## Step 4: フロント初期化と一覧表示
+- 状態: Pending
+- メモ: Vite + React + TS、/contacts 取得して表示
+
+## Step 5: 追加/編集/削除 UI
+- 状態: Pending
+- メモ: フォームとAPI連携、基本バリデーション
+
+## Step 6: テスト・エラーハンドリング整備
+- 状態: Pending
+- メモ: ユニット/結合テスト、エラー時のUI
