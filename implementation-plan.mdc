@@ -9,12 +9,12 @@ alwaysApply: true
 - メモ: backend/frontend/cursor-rules を作成。依存ファイルと雛形を配置。
 
 ## Step 2: FastAPI 起動と DB 接続
-- 状態: Pending
-- メモ: /health エンドポイント、SQLite 接続
+- 状態: Done
+- メモ: /health 200 を確認。SQLite 接続とテーブル作成（create_all）を起動時に実施。
 
 ## Step 3: Contacts CRUD API 実装
-- 状態: Pending
-- メモ: POST/GET/PUT/DELETE、Pydanticスキーマ、ユニーク制約(email)
+- 状態: Done
+- メモ: contacts の POST/GET/PUT/DELETE 実装と動作確認。email にユニーク制約を適用。
 
 ## Step 4: フロント初期化と一覧表示
 - 状態: Pending
