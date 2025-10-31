@@ -29,4 +29,17 @@ Done
 
 ## Step 6: テスト・エラーハンドリング整備
 - 状態: Done
-- メモ: バックエンド/フロントエンドのテスト環境セットアップ、ユニットテスト実装、エラーハンドリング強化
+ - メモ:
+	 - バックエンド:
+		 - テスト環境を整備（`backend/requirements-test.txt` に pytest, pytest-asyncio, httpx, pytest-cov を追加）
+		 - `backend/tests/test_contacts.py` にユニットテストを実装（in-memory SQLite を用いたテスト DB、FastAPI の dependency override を利用）
+		 - カスタム例外を `backend/app/exceptions.py` に実装し、エラーハンドリングを明確化
+		 - テスト結果: 2 passed
+	 - フロントエンド:
+		 - Vitest と React Testing Library を導入しテスト環境を構築（`frontend/tests/setup.ts`、`vite.config.ts` を設定）
+		 - `frontend/tests/ContactForm.test.tsx` を実装・調整し、`ContactForm` のバリデーションと送信ロジックを検証
+		 - UI 改善: `frontend/src/components/Toast.tsx`（トースト通知）を追加、`ContactForm` のエラーハンドリングを改善
+		 - テスト結果: 5 passed（全テストパス）
+	 - 備考:
+		 - Pydantic v2 の deprecation 警告が出ています（将来的に ConfigDict への移行が必要）
+		 - 次の推奨タスク: CI（GitHub Actions）で `pytest` と `vitest` を自動実行するワークフローを追加
