@@ -37,14 +37,16 @@ export default function ContactsPage() {
   };
 
   return (
-    <div>
-      <h2>Contacts</h2>
+    <div className="container">
+      <div className="header">
+        <h1>Contacts</h1>
+      </div>
 
       {/* create form shown when not editing; when editing, show edit form above the list */}
       {!editing ? (
         <ContactForm onSubmit={addContact} />
       ) : (
-        <div>
+        <div style={{ marginBottom: 8 }}>
           <h3>Editing: {editing.name}</h3>
           <ContactForm
             mode="edit"
@@ -56,21 +58,29 @@ export default function ContactsPage() {
       )}
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="loading">Loading...</p>
       ) : (
-        <ul>
+        <div className="list">
           {contacts.map((c) => (
-            <li key={c.id} style={{ marginBottom: 6 }}>
-              <strong>{c.name}</strong> ({c.email}) {c.phone ? `- ${c.phone}` : ""}
-              <button onClick={() => setEditing(c)} style={{ marginLeft: 8 }}>
-                Edit
-              </button>
-              <button onClick={() => deleteContact(c.id)} style={{ marginLeft: 8 }}>
-                Delete
-              </button>
-            </li>
+            <div key={c.id} className="card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                <div>
+                  <strong>{c.name}</strong>
+                  <div className="meta">{c.email}</div>
+                </div>
+                <div className="meta">{c.phone ?? ''}</div>
+              </div>
+              <div className="actions">
+                <button className="btn" onClick={() => setEditing(c)}>
+                  Edit
+                </button>
+                <button className="btn btn-danger" onClick={() => deleteContact(c.id)}>
+                  Delete
+                </button>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

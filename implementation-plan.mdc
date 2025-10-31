@@ -43,3 +43,25 @@ Done
 	 - 備考:
 		 - Pydantic v2 の deprecation 警告が出ています（将来的に ConfigDict への移行が必要）
 		 - 次の推奨タスク: CI（GitHub Actions）で `pytest` と `vitest` を自動実行するワークフローを追加
+
+## Step 7: フロントの UI デザイン調整（TypeScript + CSS）
+- 状態: Done
+- メモ:
+	- 目的: フロントエンドの見やすさを向上させるため、中央化したスタイルを導入し既存コンポーネントのマークアップをクラスベースへ置換
+	- 変更点（主なファイル）:
+		- `frontend/src/styles.css` を追加（フォーム、ボタン、カード、トースト等の共通スタイル）
+		- `frontend/src/components/ContactForm.tsx` のインラインスタイルをクラスに置換し、レスポンシブな行レイアウトへ変更
+		- `frontend/src/pages/Contacts.tsx` をカードレイアウトに変更し、グリッドでの表示を導入
+		- `frontend/src/components/Toast.tsx` のスタイルをプロジェクトCSSへ移行（ポータル挙動は維持）
+		- `frontend/src/App.tsx` で `styles.css` をインポートしレイアウトクラスを適用
+	- 動作・確認方法:
+		1. `cd frontend && npm install`（必要に応じて）
+		2. `npm run dev` で Vite 開発サーバを起動
+		3. ブラウザで開き、Contacts ページのフォーム表示・カード表示・編集/削除・トースト表示を確認
+	- 備考:
+		- 既存の API ロジックやバリデーションは変更していないため、機能は既存通り動作するはずです。
+		- トーストや色は Tailwind を前提としない純粋な CSS を用意しました。もしプロジェクトで Tailwind を使用している場合は調整が必要です。
+	- 次の推奨タスク:
+		- カラーパレットの別案（3案）を作り :root 変数で切り替えられるようにする
+		- フロントのビルド確認（`npm run build`）と CI ワークフローへの組み込み
+		- UI ストーリーブック導入や visual regression テストの検討

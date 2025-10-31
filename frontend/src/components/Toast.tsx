@@ -9,19 +9,10 @@ interface ToastProps {
 
 function Toast({ message, type, onClose }: ToastProps) {
   return createPortal(
-    <div
-      className={`fixed top-4 right-4 p-4 rounded shadow-lg ${
-        type === 'error' ? 'bg-red-100 text-red-900' : 'bg-green-100 text-green-900'
-      }`}
-      role="alert"
-    >
-      <div className="flex justify-between items-center">
-        <span>{message}</span>
-        <button
-          className="ml-4 text-gray-500 hover:text-gray-700"
-          onClick={onClose}
-          aria-label="Close"
-        >
+    <div className={`toast ${type === 'error' ? 'error' : 'success'}`} role="alert">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span style={{ flex: 1 }}>{message}</span>
+        <button onClick={onClose} aria-label="Close" className="btn">
           ×
         </button>
       </div>
