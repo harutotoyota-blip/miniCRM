@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 from ..database import Base, engine, get_db
 from .. import models, schemas
+from ..exceptions import EmailAlreadyRegisteredError, ContactNotFoundError
 
 Base.metadata.create_all(bind=engine)
 
@@ -10,13 +12,19 @@ router = APIRouter(prefix="/contacts", tags=["contacts"])
 
 @router.post("", response_model=schemas.ContactOut, status_code=status.HTTP_201_CREATED)
 def create_contact(payload: schemas.ContactCreate, db: Session = Depends(get_db)):
+    # basic duplicate check (race condition still possible, handled below)
     exists = db.query(models.Contact).filter(models.Contact.email == payload.email).first()
     if exists:
-        raise HTTPException(status_code=400, detail="Email already exists")
+        raise EmailAlreadyRegisteredError(payload.email)
 
     new_contact = models.Contact(name=payload.name, email=payload.email, phone=payload.phone)
     db.add(new_contact)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # handle unique constraint races
+        db.rollback()
+        raise EmailAlreadyRegisteredError(payload.email)
     db.refresh(new_contact)
     return new_contact
 
@@ -28,7 +36,7 @@ def list_contacts(db: Session = Depends(get_db), skip: int = 0, limit: int = 50)
 def update_contact(contact_id: int, payload: schemas.ContactUpdate, db: Session = Depends(get_db)):
     contact = db.query(models.Contact).get(contact_id)
     if not contact:
-        raise HTTPException(status_code=404, detail="Contact not found")
+        raise ContactNotFoundError(contact_id)
     if payload.name is not None:
         contact.name = payload.name
     if payload.phone is not None:
@@ -41,7 +49,7 @@ def update_contact(contact_id: int, payload: schemas.ContactUpdate, db: Session 
 def delete_contact(contact_id: int, db: Session = Depends(get_db)):
     contact = db.query(models.Contact).get(contact_id)
     if not contact:
-        raise HTTPException(status_code=404, detail="Contact not found")
+        raise ContactNotFoundError(contact_id)
     db.delete(contact)
     db.commit()
     return None

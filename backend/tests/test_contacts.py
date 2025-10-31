@@ -80,5 +80,18 @@ def test_create_contact_duplicate_email(client):
         }
     )
     assert response.status_code == 400
-    # Router currently returns "Email already exists" on duplicate
-    assert "Email already exists" in response.json()["detail"]
+    # Router now raises EmailAlreadyRegisteredError with a message including the email
+    assert "already registered" in response.json()["detail"]
+
+
+def test_create_contact_invalid_phone(client):
+    # phone doesn't match the allowed pattern -> should be rejected by pydantic (422)
+    response = client.post(
+        "/api/contacts",
+        json={
+            "name": "Bad Phone",
+            "email": "badphone@example.com",
+            "phone": "not-a-phone"
+        }
+    )
+    assert response.status_code == 422

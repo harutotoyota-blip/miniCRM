@@ -70,6 +70,28 @@ describe('ContactForm', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
+  it('should validate phone format', async () => {
+    const onSubmit = vi.fn()
+    render(<ContactForm onSubmit={onSubmit} />)
+
+    await act(async () => {
+      fireEvent.change(screen.getByPlaceholderText('Name'), { 
+        target: { value: 'Test User' } 
+      })
+      fireEvent.change(screen.getByPlaceholderText('Email'), { 
+        target: { value: 'test@example.com' } 
+      })
+      fireEvent.change(screen.getByPlaceholderText('Phone (optional)'), { 
+        target: { value: 'invalid-phone' } 
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    })
+
+    const error = await screen.findByText('Enter a valid phone number')
+    expect(error).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it('should submit form with valid data', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     render(<ContactForm onSubmit={onSubmit} />)

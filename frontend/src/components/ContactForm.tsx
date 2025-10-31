@@ -20,25 +20,38 @@ export default function ContactForm({ onSubmit, initial, mode = "create", onCanc
   const [email, setEmail] = useState(initial?.email ?? "");
   const [phone, setPhone] = useState(initial?.phone ?? "");
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; phone?: string }>({});
 
   useEffect(() => {
     setName(initial?.name ?? "");
     setEmail(initial?.email ?? "");
     setPhone(initial?.phone ?? "");
     setError(null);
+    setFieldErrors({});
   }, [initial]);
 
   const validate = (): boolean => {
+    const errs: { name?: string; email?: string; phone?: string } = {};
     if (!name.trim()) {
-      setError("Name is required");
-      return false;
+      errs.name = "Name is required";
     }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("Enter a valid email address");
-      return false;
+      errs.email = "Enter a valid email address";
     }
-    return true;
+
+    if (phone && phone.trim()) {
+      const phoneRegex = /^\+?[0-9\s\-()]{7,20}$/;
+      if (!phoneRegex.test(phone)) {
+        errs.phone = "Enter a valid phone number";
+      }
+    }
+
+    setFieldErrors(errs);
+    const firstError = errs.name ?? errs.email ?? errs.phone ?? null;
+    setError(firstError);
+    return Object.keys(errs).length === 0;
   };
 
   const handleSubmit = async (e: any) => {
@@ -61,30 +74,40 @@ export default function ContactForm({ onSubmit, initial, mode = "create", onCanc
   return (
     <form onSubmit={handleSubmit} className="form">
       <div className="form-row">
-        <input
-          className="input"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          aria-invalid={error && !name.trim() ? "true" : undefined}
-        />
-        <input
-          className="input"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          readOnly={mode === "edit"}
-          title={mode === "edit" ? "Email cannot be changed" : undefined}
-          aria-invalid={error && !email.trim() ? "true" : undefined}
-        />
-        <input
-          className="input"
-          placeholder="Phone (optional)"
-          value={phone ?? ""}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <input
+            className="input"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            aria-invalid={fieldErrors.name ? 'true' : undefined}
+          />
+          {fieldErrors.name && <small className="error">{fieldErrors.name}</small>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <input
+            className="input"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            readOnly={mode === "edit"}
+            title={mode === "edit" ? "Email cannot be changed" : undefined}
+            aria-invalid={fieldErrors.email ? 'true' : undefined}
+          />
+          {fieldErrors.email && <small className="error">{fieldErrors.email}</small>}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <input
+            className="input"
+            placeholder="Phone (optional)"
+            value={phone ?? ""}
+            onChange={(e) => setPhone(e.target.value)}
+            aria-invalid={fieldErrors.phone ? 'true' : undefined}
+          />
+          {fieldErrors.phone && <small className="error">{fieldErrors.phone}</small>}
+        </div>
 
         <div style={{ display: 'flex', gap: 8 }}>
           <button type="submit" className="btn btn-primary">
@@ -96,8 +119,7 @@ export default function ContactForm({ onSubmit, initial, mode = "create", onCanc
             </button>
           )}
         </div>
-      </div>
-      {error && <div className="error">{error}</div>}
+  </div>
     </form>
   );
 }
