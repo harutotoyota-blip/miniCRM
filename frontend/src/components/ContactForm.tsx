@@ -60,37 +60,41 @@ export default function ContactForm({ onSubmit, initial, mode = "create", onCanc
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: 12 }}>
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          style={{ padding: 6 }}
-        />
-        <input
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ padding: 6 }}
-          readOnly={mode === "edit"}
-          title={mode === "edit" ? "Email cannot be changed" : undefined}
-        />
-        <input
-          placeholder="Phone (optional)"
-          value={phone ?? ""}
-          onChange={(e) => setPhone(e.target.value)}
-          style={{ padding: 6 }}
-        />
-        <button type="submit">{mode === "create" ? "Add" : "Save"}</button>
-        {mode === "edit" && (
-          <button type="button" onClick={() => onCancel && onCancel()} style={{ marginLeft: 6 }}>
-            Cancel
-          </button>
-        )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            style={{ padding: 6 }}
+            aria-invalid={error && !name.trim() ? "true" : undefined}
+          />
+          <input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ padding: 6 }}
+            readOnly={mode === "edit"}
+            title={mode === "edit" ? "Email cannot be changed" : undefined}
+            aria-invalid={error && !email.trim() ? "true" : undefined}
+          />
+          <input
+            placeholder="Phone (optional)"
+            value={phone ?? ""}
+            onChange={(e) => setPhone(e.target.value)}
+            style={{ padding: 6 }}
+          />
+          <button type="submit">{mode === "create" ? "Add" : "Save"}</button>
+          {mode === "edit" && (
+            <button type="button" onClick={() => onCancel && onCancel()} style={{ marginLeft: 6 }}>
+              Cancel
+            </button>
+          )}
+        </div>
+        {error && <div style={{ color: "red" }}>{error}</div>}
       </div>
-      {error && <div style={{ color: "red", marginTop: 6 }}>{error}</div>}
     </form>
   );
 }

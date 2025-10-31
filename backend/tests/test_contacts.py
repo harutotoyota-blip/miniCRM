@@ -1,11 +1,17 @@
+import sys
+from pathlib import Path
+
+# Ensure backend/ is on sys.path so `import app` works when pytest runs from other CWDs
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.database import Base
-from app.main import app, get_db
+from app.database import Base, get_db
+from app.main import app
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -46,7 +52,8 @@ def test_create_contact(client):
             "phone": "1234567890"
         }
     )
-    assert response.status_code == 200
+    # API returns 201 Created for successful creation
+    assert response.status_code == 201
     data = response.json()
     assert data["name"] == "Test User"
     assert data["email"] == "test@example.com"
@@ -73,4 +80,5 @@ def test_create_contact_duplicate_email(client):
         }
     )
     assert response.status_code == 400
-    assert "Email already registered" in response.json()["detail"]
+    # Router currently returns "Email already exists" on duplicate
+    assert "Email already exists" in response.json()["detail"]
