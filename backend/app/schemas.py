@@ -1,5 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 
 # Phone: allow optional leading + and digits, spaces, hyphens and parentheses. 7-20 characters
 # Use Field(regex=...) to support multiple Pydantic versions where constr(regex=...) may differ.
@@ -23,6 +24,22 @@ class ContactUpdate(BaseModel):
 
 class ContactOut(ContactBase):
     id: int
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=100)
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=100)
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+class UserOut(BaseModel):
+    id: int
+    email: EmailStr
 
     class Config:
         from_attributes = True
