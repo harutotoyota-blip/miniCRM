@@ -16,8 +16,11 @@ export default function ContactsPage() {
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    const timer = setTimeout(() => {
+      load(query);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const addContact = async (input: { name: string; email: string; phone?: string | null }) => {
     await ContactsAPI.create(input);
