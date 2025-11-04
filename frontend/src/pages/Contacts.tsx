@@ -8,18 +8,29 @@ export default function ContactsPage() {
   const [editing, setEditing] = useState<Contact | null>(null);
   const [query, setQuery] = useState("");
 
+  // APIからデータを取得
   const load = async (q?: string) => {
     setLoading(true);
-    const data = await ContactsAPI.list(q);
-    setContacts(data);
-    setLoading(false);
+    try {
+      const data = await ContactsAPI.list(q);
+      setContacts(data);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // 初回ロード
   useEffect(() => {
-    const timer = setTimeout(() => {
+    load();
+  }, []);
+
+  // 🔍 入力中の検索をリアルタイムで反映（デバウンス付き）
+  useEffect(() => {
+    const delay = setTimeout(() => {
       load(query);
-    }, 300);
-    return () => clearTimeout(timer);
+    }, 300); // 0.4秒待機（入力が止まったタイミングで検索）
+
+    return () => clearTimeout(delay);
   }, [query]);
 
   const addContact = async (input: { name: string; email: string; phone?: string | null }) => {
@@ -40,11 +51,6 @@ export default function ContactsPage() {
     await load(query);
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await load(query);
-  };
-
   return (
     <div className="container">
       <div className="header">
@@ -52,17 +58,14 @@ export default function ContactsPage() {
       </div>
 
       {/* 🔍 検索バー */}
-      <form onSubmit={handleSearch} style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16 }}>
         <input
           type="text"
-          placeholder="Search by name or email..."
+          placeholder="Search by name..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{ padding: 8, width: "70%", marginRight: 8 }}
         />
-        <button type="submit" className="btn">
-          Search
-        </button>
         <button
           type="button"
           className="btn btn-secondary"
@@ -70,12 +73,12 @@ export default function ContactsPage() {
             setQuery("");
             load();
           }}
-          style={{ marginLeft: 8 }}
         >
           Clear
         </button>
-      </form>
+      </div>
 
+      {/* 📋 登録フォーム */}
       {!editing ? (
         <ContactForm onSubmit={addContact} />
       ) : (
@@ -83,40 +86,44 @@ export default function ContactsPage() {
           <h3>Editing: {editing.name}</h3>
           <ContactForm
             mode="edit"
-            initial={{ id: editing.id, name: editing.name, email: editing.email, phone: editing.phone }}
+            initial={{
+              id: editing.id,
+              name: editing.name,
+              email: editing.email,
+              phone: editing.phone,
+            }}
             onSubmit={updateContact}
             onCancel={() => setEditing(null)}
           />
         </div>
       )}
 
+      {/* 🔄 検索中・読み込み中表示 */}
       {loading ? (
         <p className="loading">Loading...</p>
+      ) : contacts.length === 0 ? (
+        <p>No contacts found.</p>
       ) : (
         <div className="list">
-          {contacts.length === 0 ? (
-            <p>No contacts found.</p>
-          ) : (
-            contacts.map((c) => (
-              <div key={c.id} className="card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <div>
-                    <strong>{c.name}</strong>
-                    <div className="meta">{c.email}</div>
-                  </div>
-                  <div className="meta">{c.phone ?? ''}</div>
+          {contacts.map((c) => (
+            <div key={c.id} className="card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                <div>
+                  <strong>{c.name}</strong>
+                  <div className="meta">{c.email}</div>
                 </div>
-                <div className="actions">
-                  <button className="btn" onClick={() => setEditing(c)}>
-                    Edit
-                  </button>
-                  <button className="btn btn-danger" onClick={() => deleteContact(c.id)}>
-                    Delete
-                  </button>
-                </div>
+                <div className="meta">{c.phone ?? ""}</div>
               </div>
-            ))
-          )}
+              <div className="actions">
+                <button className="btn" onClick={() => setEditing(c)}>
+                  Edit
+                </button>
+                <button className="btn btn-danger" onClick={() => deleteContact(c.id)}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
