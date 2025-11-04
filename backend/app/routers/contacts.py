@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from tarfile import LinkFallbackError
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from typing import List
+from typing import List, Optional
 from ..database import Base, engine, get_db
 from .. import models, schemas
 from ..exceptions import EmailAlreadyRegisteredError, ContactNotFoundError
@@ -29,8 +30,15 @@ def create_contact(payload: schemas.ContactCreate, db: Session = Depends(get_db)
     return new_contact
 
 @router.get("", response_model=List[schemas.ContactOut])
-def list_contacts(db: Session = Depends(get_db), skip: int = 0, limit: int = 50):
-    return db.query(models.Contact).offset(skip).limit(limit).all()
+def list_contacts(db: Session = Depends(get_db), skip: int = 0, limit: int = 50, query: Optional[str] = Query(None, description="Search keyword for name or email")):
+    q = db.query(models.Contact)
+    if query:
+        like_pattern = f"%{query}%"
+        q = q.filter(
+            (models.Contact.name.ilike(like_pattern))
+            | (models.Contact.email.ilike(like_pattern))
+        )
+    return q.offset(skip).limit(limit).all()
 
 @router.put("/{contact_id}", response_model=schemas.ContactOut)
 def update_contact(contact_id: int, payload: schemas.ContactUpdate, db: Session = Depends(get_db)):

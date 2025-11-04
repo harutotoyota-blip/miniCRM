@@ -24,10 +24,12 @@ export type UpdateContactInput = {
 };
 
 export const ContactsAPI = {
-  list: async (): Promise<Contact[]> => {
-    const { data } = await api.get("/contacts");
+  list: async (query?: string): Promise<Contact[]> => {
+    const { data } = await api.get("/contacts", {
+      params: query ? { query } : undefined,
+    });
     return data;
-  },
+  },  
   create: async (input: CreateContactInput): Promise<Contact> => {
     const { data } = await api.post("/contacts", input);
     return data;
